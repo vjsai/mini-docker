@@ -6,6 +6,7 @@ import sys
 import subprocess
 from cgroups import Cgroup
 from cgroups.user import create_user_cgroups
+import system
 try:
     from pychroot import Chroot
 except ImportError:
@@ -34,6 +35,7 @@ def run():
 
     def in_cgroup():
         try:
+            system.unshare(system.CLONE_NEWUTS)
             pid = os.getpid()
             cg = Cgroup(name)
 
