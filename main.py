@@ -19,31 +19,21 @@ def main():
         return
     elif sys.argv[1] == "run":
         run()
+    elif sys.argv[1] == "child":
+        child()
 
 
 def run():
     command = " ".join(sys.argv[2:])
     print("running command: " + command)
     name = "container"
-    user = os.getlogin()
-    create_user_cgroups(user)
+    system.clone(child,system.CLONE_NEWUTS,tuple(command))
 
-    # First we create the cgroup and we set it's cpu and memory limits
-    cg = Cgroup(name)
-    cg.set_cpu_limit(50)  # TODO : get these as command line options
-    cg.set_memory_limit(500)
-
-    def in_cgroup():
-        try:
-            system.unshare(system.CLONE_NEWUTS)
-            pid = os.getpid()
-            cg = Cgroup(name)
-
-            # add process to cgroup
-            cg.add(pid)
-        except Exception as e:
-            print("Failed to preexecute function")
-    subprocess.Popen(command, shell=True, preexec_fn=in_cgroup)
+def child(*argv):
+    child_command = ''.join(argv)
+    print("running command: " + child_command)
+    system.sethostname("container")
+    subprocess.Popen(child_command, shell=True)
 
 
 # Press the green button in the gutter to run the script.
