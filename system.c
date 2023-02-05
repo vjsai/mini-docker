@@ -21,8 +21,27 @@ _unshare(PyObject *self, PyObject *args) {
 	}
 }
 
+#define SETHOSTNAME_DOC ".. py:function:: sethostname(hostname)\n"
+
+static PyObject *
+_sethostname(PyObject *self, PyObject *args) {
+	const char *hostname;
+
+	if (!PyArg_ParseTuple(args, "s", &hostname))
+		return NULL;
+
+	if (sethostname(hostname, strlen(hostname)) == -1) {
+		PyErr_SetFromErrno(PyExc_RuntimeError);
+		return NULL;
+	}
+
+	Py_INCREF(Py_None);
+	return Py_None;
+}
+
 static PyMethodDef SystemMethods[] = {
 	{"unshare", _unshare, METH_VARARGS, UNSHARE_DOC},
+	{"sethostname", _sethostname, METH_VARARGS, SETHOSTNAME_DOC},
     {NULL, NULL, 0, NULL}        /* Sentinel */
 };
 
