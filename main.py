@@ -7,6 +7,7 @@ import subprocess
 from cgroups import Cgroup
 from cgroups.user import create_user_cgroups
 import system
+
 try:
     from pychroot import Chroot
 except ImportError:
@@ -25,13 +26,14 @@ def main():
 
 def run():
     command = " ".join(sys.argv[2:])
-    print("running command: " + command)
+    print("running command: " + command + " with pid :" + str(os.getpid()))
     name = "container"
-    system.clone(child,system.CLONE_NEWUTS,tuple(command))
+    system.clone(child, system.CLONE_NEWUTS, tuple(command))
+
 
 def child(*argv):
     child_command = ''.join(argv)
-    print("running command: " + child_command)
+    print("running command: " + child_command + " with pid :" + str(os.getpid()))
     system.sethostname("container")
     subprocess.Popen(child_command, shell=True)
 
