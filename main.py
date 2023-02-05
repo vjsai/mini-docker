@@ -28,14 +28,16 @@ def run():
     command = " ".join(sys.argv[2:])
     print("running command: " + command + " with pid :" + str(os.getpid()))
     name = "container"
-    system.clone(child, system.CLONE_NEWUTS, tuple(command))
+    pid = system.clone(child, system.CLONE_NEWUTS | system.CLONE_NEWNS | system.CLONE_NEWPID, tuple(command))
+    _, status = os.waitpid(pid, 0)
+    print('{} exited with status {}'.format(pid, status))
 
 
 def child(*argv):
     child_command = ''.join(argv)
     print("running command: " + child_command + " with pid :" + str(os.getpid()))
     system.sethostname("container")
-    subprocess.Popen(child_command, shell=True)
+    subprocess.run(child_command)
 
 
 # Press the green button in the gutter to run the script.
