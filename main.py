@@ -36,8 +36,12 @@ def run():
 def child(*argv):
     child_command = ''.join(argv)
     print("running command: " + child_command + " with pid :" + str(os.getpid()))
-    system.sethostname("container")
-    subprocess.run(child_command)
+
+    def pre_execute():
+        system.sethostname("container")
+        os.chroot("dummy_root")
+
+    subprocess.Popen(child_command, preexec_fn=pre_execute)
 
 
 # Press the green button in the gutter to run the script.
